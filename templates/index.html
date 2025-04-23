@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bharat Guide</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-map-marker-alt"></i> Bharat Guide</h1>
+        </header>
+
+        <div class="app-container">
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <div class="form-group">
+                        <div id="api-status" class="status-message"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-messages">
+                    <div class="welcome-message">
+                        <h2>Welcome to Bharat Guide</h2>
+                        <p>Your personal guide to exploring incredible India</p>
+                    </div>
+                </div>
+                
+                <div class="chat-input-container">
+                    <input type="text" id="chat-input" class="chat-input" placeholder="Ask a travel-related question..." disabled>
+                    <button id="send-btn" class="btn send-btn" disabled>
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                    <button id="clear-btn" class="btn clear-btn" title="Clear Chat">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
