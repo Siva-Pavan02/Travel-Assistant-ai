@@ -1,134 +1,3 @@
-# from dotenv import load_dotenv
-# load_dotenv()
-# import os
-# from flask import Flask, render_template, request, jsonify
-# import requests
-# import json
-# import time
-
-# from dotenv import load_dotenv
-# load_dotenv()
-
-# class GeminiAPI:
-#     def __init__(self, api_key, model="gemini-1.5-pro-latest"):
-#         """
-#         Initialize the Gemini API client
-        
-#         Args:
-#             api_key (str): The API key for Gemini
-#             model (str): The model to use (defaults to gemini-1.5-pro-latest)
-#         """
-#         self.api_key = api_key
-#         self.model = model
-#         self.base_url = "https://generativelanguage.googleapis.com/v1beta"
-        
-#         # Validate API key by listing models
-#         self.list_models()
-    
-#     def list_models(self):
-#         """
-#         List available models to validate API key
-        
-#         Returns:
-#             dict: JSON response from the API
-        
-#         Raises:
-#             Exception: If the API key is invalid or there's an error
-#         """
-#         url = f"{self.base_url}/models?key={self.api_key}"
-        
-#         response = requests.get(url)
-        
-#         if response.status_code != 200:
-#             error_message = f"Failed to list models. Status code: {response.status_code}"
-#             try:
-#                 error_data = response.json()
-#                 if "error" in error_data:
-#                     error_message = f"API Error: {error_data['error'].get('message', 'Unknown error')}"
-#             except:
-#                 pass
-#             raise Exception(error_message)
-        
-#         return response.json()
-    
-#     def generate_content(self, prompt, max_retries=3):
-#         """
-#         Generate content using the Gemini API
-        
-#         Args:
-#             prompt (str): The prompt to send to the model
-#             max_retries (int): Maximum number of retries for rate limiting
-        
-#         Returns:
-#             str: The generated content
-            
-#         Raises:
-#             Exception: If there's an error generating content
-#         """
-#         url = f"{self.base_url}/models/{self.model}:generateContent?key={self.api_key}"
-        
-#         headers = {
-#             "Content-Type": "application/json"
-#         }
-        
-#         payload = {
-#             "contents": [
-#                 {
-#                     "parts": [
-#                         {
-#                             "text": prompt
-#                         }
-#                     ]
-#                 }
-#             ]
-#         }
-        
-#         # Add retry logic for rate limiting
-#         retries = 0
-#         while retries < max_retries:
-#             response = requests.post(url, headers=headers, data=json.dumps(payload))
-            
-#             if response.status_code == 429:  # Rate limiting
-#                 retries += 1
-#                 time.sleep(2 ** retries)  # Exponential backoff
-#                 continue
-            
-#             if response.status_code != 200:
-#                 error_message = f"Failed to generate content. Status code: {response.status_code}"
-#                 try:
-#                     error_data = response.json()
-#                     if "error" in error_data:
-#                         error_message = f"API Error: {error_data['error'].get('message', 'Unknown error')}"
-#                 except:
-#                     pass
-#                 raise Exception(error_message)
-            
-#             break
-        
-#         if retries == max_retries:
-#             raise Exception("Maximum retries reached due to rate limiting")
-        
-#         # Parse the response
-#         response_data = response.json()
-        
-#         try:
-#             # Extract the generated text from the response
-#             generated_text = ""
-#             if "candidates" in response_data:
-#                 for candidate in response_data["candidates"]:
-#                     if "content" in candidate:
-#                         for part in candidate["content"]["parts"]:
-#                             if "text" in part:
-#                                 generated_text += part["text"]
-            
-#             if not generated_text:
-#                 raise Exception("No text was generated in the response")
-                
-#             return generated_text
-#         except Exception as e:
-#             raise Exception(f"Failed to parse response: {str(e)}")
-
-
 # Load environment variables (and fallback to hardcoded key if not set)
 from dotenv import load_dotenv
 import os
@@ -206,13 +75,13 @@ class GeminiAPI:
 
 # Flask routes below
 @app.route('/')
- def index():
+def index():
     return render_template('index.html')
 
 chat_histories = {}
 
 @app.route('/api/chat', methods=['POST'])
- def chat():
+def chat():
     data = request.json
     user_input = data.get('message', '')
     role = data.get('role', 'Tourist')
@@ -236,7 +105,7 @@ chat_histories = {}
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/validate-key', methods=['GET'])
- def validate_key():
+def validate_key():
     try:
         gemini = GeminiAPI(GEMINI_API_KEY)
         models = gemini.list_models()
@@ -245,7 +114,7 @@ chat_histories = {}
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/models', methods=['GET'])
- def get_models():
+def get_models():
     model_options = {
         "gemini-1.5-pro-latest": "Gemini 1.5 Pro (Recommended)",
         "gemini-1.5-flash": "Gemini 1.5 Flash (Faster)",
@@ -255,7 +124,7 @@ chat_histories = {}
     return jsonify({'success': True, 'models': model_options})
 
 @app.route('/api/roles', methods=['GET'])
- def get_roles():
+def get_roles():
     role_options = {
         "Tourist": "General tourist looking for recommendations",
         "Travel Agent": "Professional travel advisor",

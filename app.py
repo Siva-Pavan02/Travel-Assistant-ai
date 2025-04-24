@@ -1,4 +1,3 @@
-import streamlit as st
 import os
 from flask import Flask, render_template, request, jsonify
 import requests
@@ -119,119 +118,71 @@ class GeminiAPI:
             raise Exception(f"Failed to parse response: {str(e)}")
 
 
-def get_travel_assistant_prompt(role, user_input):
+def get_travel_assistant_prompt(role, user_input, history=None):
     """
     Create a prompt for the Bharat Guide based on the role and user input
     
     Args:
         role (str): The role of the travel assistant (Tourist, Travel Agent, etc.)
         user_input (str): The user's question or request
+        history (list, optional): List of previous messages in the conversation
     
     Returns:
         str: The formatted prompt to send to the Gemini API
     """
-    prompt = f"""
-You are an AI Assistant named Bharat Guide that specializes in travel information about India.
-
-Your role: {role}  
-(Examples: Tourist, Travel Agent, Local Guide, Backpacker)
-
-Your job is to answer ONLY travel-related questions about India.  
-This includes:
-- Places to visit in India
-- Travel itineraries for Indian destinations
-- Indian cuisine and food specialties
-- Cultural tips and traditions in India
-- Transportation options within India
-- Weather patterns across Indian regions
-- Visa requirements, permits, bookings for Indian travel
-
-FORMAT YOUR RESPONSES for better readability:
-- Use bullet points (- ) or numbered lists (1. ) for lists
-- Use bold for important terms
-- Keep paragraphs short (2-3 sentences)
-- Always organize information in a clean, structured way
-- Use 1-2 emoji max if appropriate for the topic
-
-If the question is not related to travel in India (e.g., math, programming, health, etc.), politely decline and suggest asking about Indian travel destinations instead.
-
-Current user's message: "{user_input}"
-
-Respond as a helpful India travel guide, adapting your tone and detail based on the user's selected role. Be informative but concise. Include some local terms or phrases where appropriate to add authenticity.
-"""
-    return prompt.strip()
-
-
-def get_travel_assistant_prompt_with_history(role, user_input, history):
-    """
-    Create a prompt for the Bharat Guide that includes conversation history
-    
-    Args:
-        role (str): The role of the travel assistant (Tourist, Travel Agent, etc.)
-        user_input (str): The user's current question or request
-        history (list): List of previous messages in the conversation
-    
-    Returns:
-        str: The formatted prompt to send to the Gemini API
-    """
-    # Format conversation history
+    # Format conversation history if provided
     conversation = ""
-    if history and len(
-            history
-    ) > 1:  # At least one exchange (more than just the current message)
+    if history and len(history) > 1:
         conversation = "Previous conversation:\n"
-        # Skip the current message which is already in the history
-        for i, msg in enumerate(history[:-1]):
-            if msg["role"] == "user":
-                conversation += f"User: {msg['content']}\n"
-            else:
-                conversation += f"Bharat Guide: {msg['content']}\n"
+        for msg in history[:-1]:  # Skip the current message
+            sender = "User" if msg["role"] == "user" else "Bharat Guide"
+            conversation += f"{sender}: {msg['content']}\n"
         conversation += "\n"
-
+    
     prompt = f"""
-You are an AI Assistant named Bharat Guide that specializes in travel information about India.
+You are an AI Assistant named Bharat Guide that provides travel-related information about India.
 
-Your role: {role}  
+Role: {role}
 (Examples: Tourist, Travel Agent, Local Guide, Backpacker)
 
-Your job is to answer ONLY travel-related questions about India.  
-This includes:
-- Places to visit in India
-- Travel itineraries for Indian destinations
-- Indian cuisine and food specialties
-- Cultural tips and traditions in India
-- Transportation options within India
-- Weather patterns across Indian regions
-- Visa requirements, permits, bookings for Indian travel
+Answer ONLY travel-related questions about India.  
+Topics you can cover:
+- Destinations and sightseeing places
+- Trip plans, itineraries, weekend getaways
+- Indian food and cuisine by region
+- Culture, traditions, local phrases, etiquette
+- Transport options (trains, buses, taxis)
+- Climate and best times to visit
+- Entry rules, permits, visa guidance
 
-FORMAT YOUR RESPONSES for better readability:
-- Use bullet points (- ) or numbered lists (1. ) for lists
-- Use bold for important terms
-- Keep paragraphs short (2-3 sentences)
-- Always organize information in a clean, structured way
-- Use 1-2 emoji max if appropriate for the topic
+Response Guidelines:
+- Do NOT use markdown (e.g., **, *, #) or code blocks
+- Use plain text for readability and clean formatting
+- Structure replies using:
+- Bullet points (- ) for unordered info
+- Numbered lists (1. ) when listing steps or order
+- Use **bold** text only where emphasis is essential
+- Keep paragraphs short (2-3 lines max)
+- Limit emojis to 1–2 if they enhance clarity (e.g., 🛕, 🏞️)
+- Include only 1-2 Hindi words or phrases maximum per response with translation in parentheses
+- Keep your sense of humor moderate - be 20% humorous rather than overly enthusiastic or joking
+- Maintain a helpful, friendly tone but don't try too hard to be funny
 
 {conversation}
+Current user message: "{user_input}"
 
-Current user's message: "{user_input}"
-
-Respond as a helpful India travel guide, adapting your tone and detail based on the user's selected role. 
-Be informative but concise. Include some local terms or phrases where appropriate to add authenticity.
-
-IMPORTANT: Remember the context of the conversation. Be consistent with your previous answers. 
-If the user refers to something mentioned earlier, use that information in your response. 
-If they ask a follow-up question, connect it to what was previously discussed.
+Reply in a friendly, moderately informative way, suitable to the user's role. Include at most 1-2 Hindi words where natural, and keep humor at a moderate 40% level.
 """
     return prompt.strip()
+
+
+# In-memory chat history storage - in a production app, this would use a database
+chat_histories = {}
 
 
 @app.route('/')
 def index():
     return render_template('index.html')
-
-
-# In-memory chat history storage - in a production app, this would use a database
-chat_histories = {}
 
 
 @app.route('/api/chat', methods=['POST'])
@@ -241,7 +192,6 @@ def chat():
     role = data.get('role', 'Tourist')
     model = data.get('model', 'gemini-1.5-pro-latest')
     session_id = data.get('session_id', 'default')
-    chat_history = data.get('chat_history', [])
 
     # Store or retrieve the conversation history
     if session_id not in chat_histories:
@@ -255,8 +205,7 @@ def chat():
         gemini = GeminiAPI(GEMINI_API_KEY, model)
 
         # Create the travel assistant prompt with conversation context
-        prompt = get_travel_assistant_prompt_with_history(
-            role, user_input, chat_histories[session_id])
+        prompt = get_travel_assistant_prompt(role, user_input, chat_histories[session_id])
 
         # Generate the response
         response = gemini.generate_content(prompt)
