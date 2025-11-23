@@ -1,4 +1,4 @@
-# Bharat Guide - AI Travel Assistant for India
+# WayFinder - AI Travel Assistant for India
 
 An intelligent travel assistant chatbot powered by Google's Gemini API, specialized in providing comprehensive travel information about India.
 
@@ -190,11 +190,6 @@ gunicorn -w 4 -b 0.0.0.0:5000 app:app
 
 This project is licensed under the MIT License - see LICENSE file for details.
 
-## Support
-
-For issues and questions:
-- Create an issue on GitHub
-- Contact: [Your contact info]
 
 ## Acknowledgments
 
