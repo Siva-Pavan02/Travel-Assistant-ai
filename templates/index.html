@@ -3,45 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bharat Guide</title>
+    <title>WayFinder - AI Travel Assistant for India</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1><i class="fas fa-map-marker-alt"></i> Bharat Guide</h1>
-        </header>
+    <div class="app-wrapper">
+        <!-- Main Chat Area -->
+        <main class="main-content">
+            <div class="chat-wrapper">
+                <!-- Header -->
+                <header class="chat-header">
+                    <div class="header-title">
+                        <h1><i class="fas fa-suitcase"></i> WayFinder</h1>
+                        <p>✨ Explore India's beauty & culture</p>
+                    </div>
+                </header>
 
-        <div class="app-container">
-            <div class="sidebar">
-                <div class="sidebar-section">
-                    <div class="form-group">
-                        <div id="api-status" class="status-message"></div>
+                <!-- Messages Area -->
+                <div class="messages-container" id="chat-messages">
+                    <div class="welcome-section">
+                        <div class="welcome-icon">
+                            <i class="fas fa-map-location-dot"></i>
+                        </div>
+                        <h2>Welcome to WayFinder</h2>
+                        <p>Your intelligent AI companion for exploring the incredible destinations, cultures, and experiences of India</p>
+                        
+                        <div class="quick-prompts">
+                            <button class="quick-prompt" onclick="setMessage('What are the best destinations to visit in India?')">
+                                <i class="fas fa-pagelines"></i>
+                                <span>Top destinations</span>
+                            </button>
+                            <button class="quick-prompt" onclick="setMessage('When is the best time to visit India?')">
+                                <i class="fas fa-thermometer-half"></i>
+                                <span>Best time to visit</span>
+                            </button>
+                            <button class="quick-prompt" onclick="setMessage('Tell me about Indian cuisine and local food')">
+                                <i class="fas fa-leaf"></i>
+                                <span>Local cuisine</span>
+                            </button>
+                            <button class="quick-prompt" onclick="setMessage('What are the transport options in India?')">
+                                <i class="fas fa-car"></i>
+                                <span>Transport guide</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="chat-container">
-                <div class="chat-messages" id="chat-messages">
-                    <div class="welcome-message">
-                        <h2>Welcome to Bharat Guide</h2>
-                        <p>Your personal guide to exploring incredible India</p>
+                <!-- Input Area -->
+                <div class="input-section">
+                    <div class="input-container">
+                        <input 
+                            type="text" 
+                            id="chat-input" 
+                            class="message-input" 
+                            placeholder="Ask me anything about traveling in India..."
+                        >
+                        <button id="send-btn" class="send-button" title="Send message">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
                     </div>
-                </div>
-                
-                <div class="chat-input-container">
-                    <input type="text" id="chat-input" class="chat-input" placeholder="Ask a travel-related question..." disabled>
-                    <button id="send-btn" class="btn send-btn" disabled>
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                    <button id="clear-btn" class="btn clear-btn" title="Clear Chat">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                    <p class="input-disclaimer">WayFinder can make mistakes. Consider checking important information.</p>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
